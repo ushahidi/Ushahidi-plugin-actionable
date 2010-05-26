@@ -13,5 +13,7 @@ Actionable Report Example:
 * Report that someone somewhere needs water
 
 == Installation ==
+1. Copy the entire /actionable/ directory into your /plugins/ directory.
+2. Activate the plugin.
 
 == Changelog ==
