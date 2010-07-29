@@ -2,7 +2,7 @@
 name: Actionable
 website: http://www.ushahidi.com
 description: Mark a report as Actionable. If the report is actionable, include more details about who acted on it.
-version: 0.5
+version: 0.6
 requires: 2.0
 tested up to: 2.0
 author: David Kobia
@@ -17,3 +17,9 @@ Actionable Report Example:
 2. Activate the plugin.
 
 == Changelog ==
+
+0.6
+* Finished plugin
+* Fixed issue with installation
+* Fixed css issues
+* TODO form validation

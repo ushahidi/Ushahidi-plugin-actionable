@@ -1,0 +1,3 @@
+div.action-taken { margin: 1em 0; padding: 1em; background: #fffbe0; border: solid 2px #FFF19F; line-height: 1.3em; }
+#action-taken-badge { font-size: 1.2em; background: #009200; font-weight: bold; color: #fff; padding: 0.25em 0.5em; margin: 0 1em 0 0; float: left; }
+#action-summary { float:left; padding: 0.25em 0.5em;}

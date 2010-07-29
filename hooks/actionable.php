@@ -42,14 +42,15 @@ class actionable {
 					// Hook into the form itself
 					Event::add('ushahidi_action.report_form_admin', array($this, '_report_form'));
 					// Hook into the report_submit_admin (post_POST) event right before saving
-					Event::add('ushahidi_action.report_submit_admin', array($this, '_report_validate'));
+					// Event::add('ushahidi_action.report_submit_admin', array($this, '_report_validate'));
 					// Hook into the report_edit (post_SAVE) event
 					Event::add('ushahidi_action.report_edit', array($this, '_report_form_submit'));
 					break;
 				
 				// Hook into the Report view (front end)
 				case 'view':
-					Event::add('ushahidi_action.project_display', array($this, '_report_view'));
+					plugin::add_stylesheet('actionable/views/css/actionable');
+					Event::add('ushahidi_action.report_meta', array($this, '_report_view'));
 					break;
 			}
 		}
@@ -91,33 +92,23 @@ class actionable {
 	}
 	
 	/**
-	 * Validate Form Submission
-	 */
-	public function _report_validate()
-	{
-		
-	}
-	
-	/**
 	 * Handle Form Submission and Save Data
 	 */
 	public function _report_form_submit()
 	{
-		$incident = Event::$data['incident'];
-		$post = Event::$data['post'];
-		$id = Event::$data['id'];
+		$incident = Event::$data;
 
-		if ($post)
+		if ($_POST)
 		{
 			$action_item = ORM::factory('actionable')
-				->where('incident_id', $id)
+				->where('incident_id', $incident->id)
 				->find();
 			$action_item->incident_id = $incident->id;
-			$action_item->actionable = isset($post['actionable']) ? 
-				$post['actionable'] : "";
-			$action_item->action_taken = isset($post['action_taken']) ?
-				$post['action_taken'] : "";
-			$action_item->action_summary = $post['action_summary'];
+			$action_item->actionable = isset($_POST['actionable']) ? 
+				$_POST['actionable'] : "";
+			$action_item->action_taken = isset($_POST['action_taken']) ?
+				$_POST['action_taken'] : "";
+			$action_item->action_summary = $_POST['action_summary'];
 			$action_item->save();
 			
 		}
@@ -129,7 +120,23 @@ class actionable {
 	 */
 	public function _report_view()
 	{
-		
+		$incident_id = Event::$data;
+		if ($incident_id)
+		{
+			$actionable = ORM::factory('actionable')
+				->where('incident_id', $incident_id)
+				->find();
+			if ($actionable->loaded)
+			{
+				if ($actionable->actionable)
+				{
+					$report = View::factory('actionable_report');
+					$report->action_taken = $actionable->action_taken;
+					$report->action_summary = $actionable->action_summary;
+					$report->render(TRUE);
+				}
+			}
+		}
 	}
 	
 	/**

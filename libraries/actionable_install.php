@@ -30,7 +30,8 @@ class Actionable_Install {
 	{
 		// Create the database tables.
 		// Also include table_prefix in name
-		$this->db->query('CREATE TABLE `'.Kohana::config('database.default.table_prefix').'actionable` (
+		$this->db->query('
+			CREATE TABLE IF NOT EXISTS `'.Kohana::config('database.default.table_prefix').'actionable` (
 				  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
 				  `incident_id` int(11) NOT NULL,
 				  `actionable` tinyint(4) NOT NULL DEFAULT \'0\',
