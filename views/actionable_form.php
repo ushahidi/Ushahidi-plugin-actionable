@@ -1,9 +1,12 @@
 <!-- report is actionable -->
 <div class="row">
 	<h4 style="color: #009200;">
-		<?php print form::checkbox('actionable', '1', $actionable); ?> Actionable?
-		<span>Check if responders can act on this information.</span>
-	</h4>
+		Actionable:
+    <span>Check if responders can act on this information.</span>
+  </h4>
+    <?php print form::radio('actionable', '1', $actionable == 0); ?> Un-actionable
+    <?php print form::radio('actionable', '1', $actionable == 1); ?> Actionable
+		<?php print form::radio('actionable', '1', $actionable == 2); ?> Urgent
 </div>
 <!-- / report is actionable -->
 

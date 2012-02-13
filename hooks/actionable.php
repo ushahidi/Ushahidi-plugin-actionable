@@ -131,6 +131,7 @@ class actionable {
 				if ($actionable->actionable)
 				{
 					$report = View::factory('actionable_report');
+					$report->actionable = $actionable->actionable;
 					$report->action_taken = $actionable->action_taken;
 					$report->action_summary = $actionable->action_summary;
 					$report->render(TRUE);
