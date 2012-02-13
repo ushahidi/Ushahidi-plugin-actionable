@@ -46,6 +46,7 @@ class Actionable_Install {
 	 */
 	public function uninstall()
 	{
-		$this->db->query('DROP TABLE `'.Kohana::config('database.default.table_prefix').'actionable`');
+		$this->db->query('DROP TABLE `'.Kohana::config('database.default.table_prefix').'actionable`;');
 	}
+  
 }
