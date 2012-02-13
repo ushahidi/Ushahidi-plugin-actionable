@@ -1,12 +1,12 @@
 <div class="action-taken clearingfix">
-	<?php if ($actionable == 1) { ?>
-    <div id="action-taken-badge">
-      Actionable
+	<?php if (!$action_taken && $actionable == 1) { ?>
+    <div id="actionable-badge">
+      Action needed
     </div>
 	<?php }; ?>
-  <?php if ($actionable == 2) { ?>
-    <div id="action-taken-badge">
-      Urgent
+  <?php if (!$action_taken && $actionable == 2) { ?>
+    <div id="action-urgent-badge">
+      Action urgent
     </div>
 	<?php }; ?>
   <?php if ($action_taken) { ?>
