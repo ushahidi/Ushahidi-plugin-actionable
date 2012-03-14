@@ -162,19 +162,27 @@ class actionable {
 				->where('incident_id', $incident_id)
 				->find();
 			if ($action_item->loaded)
-			{
-				if ($action_item->actionable)
+			{// Flag urgent too
+				if ($action_item->actionable == 1)
 				{
-					echo "<actionable>YES</actionable>";
+					echo "<actionable>YES</actionable>\n";
+					echo "<urgent>NO</urgent>\n";
+				}
+				elseif ($action_item->actionable == 2)
+				{
+					echo "<actionable>YES</actionable>\n";
+					echo "<urgent>YES</urgent>\n";
 				}
 				else
 				{
-					echo "<actionable>NO</actionable>";
+					echo "<actionable>NO</actionable>\n";
+					echo "<urgent>NO</urgent>\n";
 				}
 			}
 			else
 			{
-				echo "<actionable>NO</actionable>";
+				echo "<actionable>NO</actionable>\n";
+				echo "<urgent>NO</urgent>\n";
 			}
 		}
 	}
