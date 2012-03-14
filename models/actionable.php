@@ -19,4 +19,26 @@ class Actionable_Model extends ORM
 	
 	// Database table name
 	protected $table_name = 'actionable';
+	
+	public function status() {
+		if ($this->actionable)
+		{
+			if ($this->action_taken)
+			{
+				return 'Action taken';
+			}
+			elseif ($this->actionable == 2)
+			{
+				return 'Urgent';
+			}
+			else
+			{
+				return 'Actionable';
+			}
+		}
+		else
+		{
+			return 'Not actionable';
+		}
+	}
 }

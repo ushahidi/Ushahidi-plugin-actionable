@@ -74,12 +74,11 @@
 									<th class="col-2"><?php echo Kohana::lang('ui_main.report_details');?></th>
 									<th class="col-3"><?php echo Kohana::lang('ui_main.date');?></th>
 									<th class="col-4"><?php echo Kohana::lang('ui_main.actions');?></th>
-									<th class="col-4">Status</th>
 								</tr>
 							</thead>
 							<tfoot>
 								<tr class="foot">
-									<td colspan="5">
+									<td colspan="4">
 										<?php echo $pagination; ?>
 									</td>
 								</tr>
@@ -87,7 +86,7 @@
 							<tbody>
 							<?php if ($total_items == 0): ?>
 								<tr>
-									<td colspan="5" class="col">
+									<td colspan="4" class="col">
 										<h3><?php echo Kohana::lang('ui_main.no_results');?></h3>
 									</td>
 								</tr>
@@ -234,7 +233,8 @@
 										</td>
 										<td class="col-3"><?php echo $incident_date; ?></td>
 										<td class="col-4">
-											<ul>
+											<ul><li class="none-separator"><?php echo isset($incident->actionable) ? $incident->actionable : 'Not actionable'; ?></li></ul>
+											<!--<ul>
 												<li class="none-separator">
 													<?php if ($incident_approved) {?>
 													<a href="#" class="status_yes" onclick="reportAction('u','UNAPPROVE', '<?php echo $incident_id; ?>');"><?php echo Kohana::lang('ui_main.approve');?></a>
@@ -244,9 +244,8 @@
 												</li>
 												<li><a href="#"<?php if ($incident_verified) echo " class=\"status_yes\"" ?> onclick="reportAction('v','VERIFY', '<?php echo $incident_id; ?>');"><?php echo Kohana::lang('ui_main.verify');?></a></li>
 												<li><a href="#" class="del" onclick="reportAction('d','DELETE', '<?php echo $incident_id; ?>');"><?php echo Kohana::lang('ui_main.delete');?></a></li>
-											</ul>
+											</ul>-->
 										</td>
-										<td class="col-5"><?php echo ''; ?></td>
 									</tr>
 									<?php
 								}

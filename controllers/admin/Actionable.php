@@ -44,18 +44,22 @@ class Actionable_Controller extends Reports_Controller {
 
 			if (strtolower($status) == 'action')
 			{
+				$actionable_filter = 'actionable = 1 AND action_taken = 0';
 				$this->params['actionable'] = 'i.id IN (SELECT DISTINCT incident_id FROM `'.Kohana::config('database.default.table_prefix').'actionable` WHERE actionable = 1 AND action_taken = 0)';
 			}
 			elseif (strtolower($status) == 'urgent')
 			{
+				$actionable_filter = 'actionable = 2 AND action_taken = 0';
 				$this->params['actionable'] = 'i.id IN (SELECT DISTINCT incident_id FROM `'.Kohana::config('database.default.table_prefix').'actionable` WHERE actionable = 2 AND action_taken = 0)';
 			}
 			elseif (strtolower($status) == 'taken')
 			{
+				$actionable_filter = 'action_taken = 1';
 				$this->params['actionable'] = 'i.id IN (SELECT DISTINCT incident_id FROM `'.Kohana::config('database.default.table_prefix').'actionable` WHERE action_taken = 1)';
 			}
 			elseif (strtolower($status) == 'na')
 			{
+				$actionable_filter = 'actionable = 0 AND action_taken = 0';
 				$this->params['actionable'] = '(
 					i.id IN (SELECT DISTINCT incident_id FROM `'.Kohana::config('database.default.table_prefix').'actionable` WHERE actionable = 0 AND action_taken = 0) OR
 					i.id NOT IN (SELECT DISTINCT incident_id FROM `'.Kohana::config('database.default.table_prefix').'actionable`)
@@ -70,6 +74,26 @@ class Actionable_Controller extends Reports_Controller {
 		parent::index($page);
 		
 		$this->template->content->status = $status;
+		
+		// Grab all actionable entries at once
+		$factory = ORM::factory('actionable');
+		if (isset($actionable_filter)) $factory->where($actionable_filter);
+		
+		$actionables = array();
+		foreach ($factory->find_all() as $actionable) {
+			$actionables[$actionable->incident_id] = $actionable;
+		}
+		
+		$incidents = array();
+		foreach ($this->template->content->incidents as $k => $incident)
+		{
+			if (isset($actionables[$incident->incident_id]))
+			{
+				$incident->actionable = $actionables[$incident->incident_id]->status();
+			}
+			$incidents[] = $incident;
+		}
+		$this->template->content->incidents = $incidents;
 		
 		// Set the filename
 		$this->template->content->set_filename('admin/actionable');
