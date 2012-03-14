@@ -4,7 +4,7 @@ website: http://www.ushahidi.com
 description: Mark a report as Actionable. If the report is actionable, include more details about who acted on it.
 version: 0.7-beta
 requires: 2.0
-tested up to: 2.0
+tested up to: 2.2
 author: David Kobia
 author website: http://www.dkfactor.com
 
