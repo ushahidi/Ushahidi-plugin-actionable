@@ -32,6 +32,9 @@ class actionable {
 	 */
 	public function add()
 	{
+		// Add a Sub-Nav Link
+		Event::add('ushahidi_action.nav_admin_reports', array($this, '_report_link'));
+
 		// Only add the events if we are on that controller
 		if (Router::$controller == 'reports')
 		{
@@ -138,6 +141,13 @@ class actionable {
 				}
 			}
 		}
+	}
+	
+	
+	public function _report_link()
+	{
+		$this_sub_page = Event::$data;
+		echo ($this_sub_page == "actionable") ? "Actionable" : "<a href=\"".url::site()."admin/actionable\">Actionable</a>";
 	}
 	
 	/**
