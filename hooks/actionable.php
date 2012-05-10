@@ -287,7 +287,7 @@ class actionable {
 			{
 				$feature['properties']['actionable'] = $actionables[$incident_id]->status();
 				$feature['properties']['strokecolor'] = $actionables[$incident_id]->color();
-				$feature['properties']['strokeopacity'] = 0.7;
+				$feature['properties']['strokeopacity'] = 0.5;
 				$feature['properties']['strokewidth'] = 5;
 				$feature['properties']['radius'] = Kohana::config('map.marker_radius')*2.5;
 				$feature['properties']['icon'] = '';
