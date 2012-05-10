@@ -41,4 +41,26 @@ class Actionable_Model extends ORM
 			return 'Not actionable';
 		}
 	}
+	
+	public function color() {
+		if ($this->actionable)
+		{
+			if ($this->action_taken)
+			{
+				return '00ff00';
+			}
+			elseif ($this->actionable == 2)
+			{
+				return 'ff0000';
+			}
+			else
+			{
+				return '0000ff';
+			}
+		}
+		else
+		{
+			return 'aaaaaa';
+		}
+	}
 }

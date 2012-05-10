@@ -62,6 +62,21 @@ class actionable {
 			// Add Actionable Tag to RSS Feed
 			Event::add('ushahidi_action.feed_rss_item', array($this, '_feed_rss'));
 		}
+		elseif (Router::$controller == 'main')
+		{
+			Event::add('ushahidi_action.map_main_filters', array($this, '_map_main_filters'));
+		}
+		elseif (Router::$controller == 'json')
+		{
+			Event::add('ushahidi_filter.fetch_incidents_set_params', array($this, '_fetch_incidents_set_params'));
+			Event::add('ushahidi_filter.json_index_features', array($this, '_json_index_features'));
+			
+			// Never cluster actionable json
+			if (Router::$method == 'cluster' AND in_array($_GET['m'], array(101,102,103,104)))
+			{
+				Router::$method = 'index';
+			}
+		}
 	}
 	
 	/**
@@ -143,7 +158,9 @@ class actionable {
 		}
 	}
 	
-	
+	/*
+	 * Add actionable link to reports admin tabs
+	 **/
 	public function _report_link()
 	{
 		$this_sub_page = Event::$data;
@@ -194,6 +211,93 @@ class actionable {
 			}
 		}
 	}
+	
+	/*
+	 * Add actionable filters on main map
+	 */
+	public function _map_main_filters()
+	{
+		echo '</div><h3>Actionable</h3><ul>';
+		echo '<li><a id="media_101" href="#"><span>All</span></a></li>';
+		echo '<li><a id="media_102" href="#"><span>Actionable</span></a></li>';
+		echo '<li><a id="media_103" href="#"><span>Urgent</span></a></li>';
+		echo '<li><a id="media_104" href="#"><span>Action Taken</span></a></li>';
+		echo '</ul><div>';
+	}
+
+	/*
+	 * Filter incidents for main map based on actionable status
+	 */
+	public function _fetch_incidents_set_params()
+	{
+		$params = Event::$data;
+		
+		// Look for fake media type
+		if (isset($_GET['m']) AND in_array($_GET['m'], array(101,102,103,104)) )
+		{
+			// Remove media type filter based on fake actionable media type
+			$sql = 'i.id IN (SELECT DISTINCT incident_id FROM '.Kohana::config('database.default.table_prefix').'media WHERE media_type IN ('.$_GET['m'].'))';
+			$key = array_search($sql, $params);
+			//var_dump($key);
+			if ($key !== FALSE)
+			{
+				unset($params[$key]);
+			}
+			
+			// Add filter based on actionable status.
+			switch ($_GET['m'])
+			{
+				case '102':
+					$params[] = 'i.id IN (SELECT DISTINCT incident_id FROM '.Kohana::config('database.default.table_prefix').'actionable
+						WHERE actionable = 1 AND action_taken = 0)';
+					break;
+				case '103':
+					$params[] = 'i.id IN (SELECT DISTINCT incident_id FROM '.Kohana::config('database.default.table_prefix').'actionable
+						WHERE actionable = 2 AND action_taken = 0)';
+					break;
+				case '104':
+					$params[] = 'i.id IN (SELECT DISTINCT incident_id FROM '.Kohana::config('database.default.table_prefix').'actionable
+						WHERE actionable = 1 AND action_taken = 1)';
+					break;
+			}
+			
+		}
+		
+		Event::$data = $params;
+	}
+	
+	/*
+	 * Customise feature display based on actionable status
+	 */
+	public function _json_index_features()
+	{
+		$features = Event::$data;
+		$results = ORM::Factory('actionable')->find_all()->as_array();
+		
+		$actionables = array();
+		foreach($results as $actionable)
+		{
+			$actionables[$actionable->incident_id] = $actionable;
+		}
+		
+		foreach($features as $key => $feature)
+		{
+			$incident_id = $feature['properties']['id'];
+			if ($actionables[$incident_id])
+			{
+				$feature['properties']['actionable'] = $actionables[$incident_id]->status();
+				$feature['properties']['strokecolor'] = $actionables[$incident_id]->color();
+				$feature['properties']['strokeopacity'] = 0.7;
+				$feature['properties']['strokewidth'] = 5;
+				$feature['properties']['radius'] = Kohana::config('map.marker_radius')*2.5;
+				$feature['properties']['icon'] = '';
+				$features[$key] = $feature;
+			}
+		}
+		
+		Event::$data = $features;
+	}
+
 }
 
 new actionable;
