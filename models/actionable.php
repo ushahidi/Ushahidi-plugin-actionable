@@ -47,7 +47,7 @@ class Actionable_Model extends ORM
 		{
 			if ($this->action_taken)
 			{
-				return '00ff00';
+				return '33ff33';
 			}
 			elseif ($this->actionable == 2)
 			{
@@ -55,7 +55,7 @@ class Actionable_Model extends ORM
 			}
 			else
 			{
-				return '0000ff';
+				return 'ffaa00';
 			}
 		}
 		else
