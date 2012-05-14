@@ -271,31 +271,34 @@ class actionable {
 	 */
 	public function _json_index_features()
 	{
-		$features = Event::$data;
-		$results = ORM::Factory('actionable')->find_all()->as_array();
-		
-		$actionables = array();
-		foreach($results as $actionable)
+		if (isset($_GET['m']) AND in_array($_GET['m'], array(101,102,103,104)) )
 		{
-			$actionables[$actionable->incident_id] = $actionable;
-		}
-		
-		foreach($features as $key => $feature)
-		{
-			$incident_id = $feature['properties']['id'];
-			if ($actionables[$incident_id])
+			$features = Event::$data;
+			$results = ORM::Factory('actionable')->find_all()->as_array();
+			
+			$actionables = array();
+			foreach($results as $actionable)
 			{
-				$feature['properties']['actionable'] = $actionables[$incident_id]->status();
-				$feature['properties']['strokecolor'] = $actionables[$incident_id]->color();
-				$feature['properties']['strokeopacity'] = 0.5;
-				$feature['properties']['strokewidth'] = 5;
-				$feature['properties']['radius'] = Kohana::config('map.marker_radius')*2.5;
-				$feature['properties']['icon'] = '';
-				$features[$key] = $feature;
+				$actionables[$actionable->incident_id] = $actionable;
 			}
+			
+			foreach($features as $key => $feature)
+			{
+				$incident_id = $feature['properties']['id'];
+				if ($actionables[$incident_id])
+				{
+					$feature['properties']['actionable'] = $actionables[$incident_id]->status();
+					$feature['properties']['strokecolor'] = $actionables[$incident_id]->color();
+					$feature['properties']['strokeopacity'] = 0.5;
+					$feature['properties']['strokewidth'] = 5;
+					$feature['properties']['radius'] = Kohana::config('map.marker_radius')*2.5;
+					$feature['properties']['icon'] = '';
+					$features[$key] = $feature;
+				}
+			}
+			
+			Event::$data = $features;
 		}
-		
-		Event::$data = $features;
 	}
 
 }
