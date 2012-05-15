@@ -52,7 +52,7 @@ class actionable {
 				
 				// Hook into the Report view (front end)
 				case 'view':
-					plugin::add_stylesheet('actionable/views/css/actionable');
+					plugin::add_stylesheet('actionable/css/actionable');
 					Event::add('ushahidi_action.report_meta', array($this, '_report_view'));
 					break;
 			}
