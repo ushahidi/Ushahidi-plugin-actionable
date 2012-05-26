@@ -1,38 +1,21 @@
 === About ===
-name: Actionable
-website: http://www.ushahidi.com
-description: Mark a report as Actionable. If the report is actionable, include more details about who acted on it.
-version: 0.7
-requires: 2.0
-tested up to: 2.2
-author: David Kobia
-author website: http://www.dkfactor.com
-
-== Description ==
-Actionable Report Example:
-* Report that someone somewhere needs water
-
-== Installation ==
-1. Copy the entire /actionable/ directory into your /plugins/ directory.
-2. Activate the plugin.
+name: Actionable - localization
+description: Add localization code
+tested up to: development
+author: PoPoutdoor
 
 == Changelog ==
+0.1 Initial release
 
-0.7
-* Allow marking reports as 'urgent' 
-* Fix badges always showing 'action taken'
-* Fix css issue with categories overlapping badges
-* Add actionable admin view
-* Fix RSS extra fields
+* Add directory i18n
+* Move language related code blocks to i18n/en_US/actionable.php
+* Modify language related code blocks to support localization
+* Create Simplified Chinese translations (i18n/zh_CN/actionable.php)
 
-0.6
-* Finished plugin
-* Fixed issue with installation
-* Fixed css issues
-* TODO form validation
+== Bug fix ==
+* Add "Event::run('ushahidi_action.map_main_filters')" to 
+  function _map_main_filters() to activate the filter function.
 
-== Feature TODO ==
+== Todo ==
+* Add Traditional Chinese translations
 
-* Actionable API feeds
-* Allow customising statuses
-* Change map item colour based on status
