@@ -75,7 +75,7 @@ class actionable {
 		{
 			Event::add('ushahidi_action.map_main_filters', array($this, '_map_main_filters'));
 		}
-		elseif (Router::$controller == 'json' oR Router::$controller == 'bigmap_json')
+		elseif (Router::$controller == 'json' OR Router::$controller == 'bigmap_json')
 		{
 			Event::add('ushahidi_filter.fetch_incidents_set_params', array($this, '_fetch_incidents_set_params'));
 			Event::add('ushahidi_filter.json_index_features', array($this, '_json_index_features'));
@@ -226,11 +226,26 @@ class actionable {
 	 */
 	public function _map_main_filters()
 	{
-		echo '</div><h3>Actionable</h3><ul>';
+/*		echo '</div><h3>Actionable</h3><ul>';
 		foreach (self::$media_values as $k => $val) {
 			echo "<li><a id=\"media_$k\" href=\"#\"><span>$val</span></a></li>";
 		}
 		echo '</ul><div>';
+*/
+		$_filter = '<div class="filters clearingfix">';
+		$_filter .= '	<div style="float:left; width: 100%">';
+		$_filter .= '		<strong>' . Kohana::lang('actionable.actionable_head') . '</strong>';
+		$_filter .= '		<ul>';
+		$_filter .= '			<li><a id="media_102" href="#"><span>' . Kohana::lang('actionable.actionable') . '</span></a></li>';
+		$_filter .= '			<li><a id="media_103" href="#"><span>' . Kohana::lang('actionable.urgent') . '</span></a></li>';
+		$_filter .= '			<li><a id="media_104" href="#"><span>' . Kohana::lang('actionable.acted') . '</span></a></li>';
+		$_filter .= '		</ul>';
+		$_filter .= '	</div>';
+		// Action::main_filters - Add items to the main_filters
+		$_filter .= "	<?php Event::run('ushahidi_action.map_main_filters');?>";
+		$_filter .= '		</div>';
+
+		echo $_filter;
 	}
 
 	/*
@@ -302,7 +317,7 @@ class actionable {
 			{
 				$actionables[$actionable->incident_id] = $actionable;
 			}
-			
+
 			foreach($features as $key => $feature)
 			{
 				$incident_id = $feature['properties']['id'];
@@ -314,6 +329,7 @@ class actionable {
 					$feature['properties']['strokewidth'] = 5;
 					$feature['properties']['radius'] = Kohana::config('map.marker_radius')*2.5;
 					$feature['properties']['icon'] = '';
+
 					$features[$key] = $feature;
 				}
 			}
