@@ -24,10 +24,10 @@
 						<li>
 							<a href="?status=0" <?php if ($status != 'action' AND $status !='urgent' AND $status != 'taken' AND $status != 'na') echo "class=\"active\""; ?>><?php echo Kohana::lang('ui_main.show_all');?></a>
 						</li>
-						<li><a href="?status=action" <?php if ($status == 'action') echo "class=\"active\""; ?>>Actionable</a></li>
-						<li><a href="?status=urgent" <?php if ($status == 'urgent') echo "class=\"active\""; ?>>Urgent</a></li>
-						<li><a href="?status=taken" <?php if ($status == 'taken') echo "class=\"active\""; ?>>Action Taken</a></li>
-						<li><a href="?status=na" <?php if ($status == 'na') echo "class=\"active\""; ?>>Not actionable</a></li>
+						<li><a href="?status=action" <?php if ($status == 'action') echo "class=\"active\""; ?>><?php echo Kohana::lang('actionable.actionable'); ?></a></li>
+						<li><a href="?status=urgent" <?php if ($status == 'urgent') echo "class=\"active\""; ?>><?php echo Kohana::lang('actionable.urgent'); ?></a></li>
+						<li><a href="?status=taken" <?php if ($status == 'taken') echo "class=\"active\""; ?>><?php echo Kohana::lang('actionable.action_taken'); ?></a></li>
+						<li><a href="?status=na" <?php if ($status == 'na') echo "class=\"active\""; ?>><?php echo Kohana::lang('actionable.not_actionable'); ?></a></li>
 					</ul>
 					<!-- tab -->
 					<div class="tab">

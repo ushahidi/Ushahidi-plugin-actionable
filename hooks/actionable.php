@@ -75,7 +75,7 @@ class actionable {
 		{
 			Event::add('ushahidi_action.map_main_filters', array($this, '_map_main_filters'));
 		}
-		elseif (Router::$controller == 'json' oR Router::$controller == 'bigmap_json')
+		elseif (Router::$controller == 'json' OR Router::$controller == 'bigmap_json')
 		{
 			Event::add('ushahidi_filter.fetch_incidents_set_params', array($this, '_fetch_incidents_set_params'));
 			Event::add('ushahidi_filter.json_index_features', array($this, '_json_index_features'));
@@ -173,7 +173,7 @@ class actionable {
 	public function _report_link()
 	{
 		$this_sub_page = Event::$data;
-		echo ($this_sub_page == "actionable") ? "Actionable" : "<a href=\"".url::site()."admin/actionable\">Actionable</a>";
+		echo ($this_sub_page == "actionable") ? Kohana::lang('actionable.actionable') : "<a href=\"".url::site()."admin/actionable\">".Kohana::lang('actionable.actionable')."</a>";
 	}
 	
 	/**
@@ -226,7 +226,7 @@ class actionable {
 	 */
 	public function _map_main_filters()
 	{
-		echo '</div><h3>Actionable</h3><ul>';
+		echo '</div><h3>'.Kohana::lang('actionable.actionable').'</h3><ul>';
 		foreach (self::$media_values as $k => $val) {
 			echo "<li><a id=\"media_$k\" href=\"#\"><span>$val</span></a></li>";
 		}
