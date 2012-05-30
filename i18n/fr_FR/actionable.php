@@ -1,7 +1,7 @@
 <?php defined('SYSPATH') or die('No direct script access.');
 	$lang = array(
-		'actionable' => 'Requiert une intervention',
-		'not_actionable' => 'Ne peut mener à une intervention',
+		'actionable' => 'Intervention nécessaire',
+		'not_actionable' => 'Ne requiert pas d’intervention',
 		'urgent' => 'Urgent',
 		'action_taken' => 'Action entreprise',
 		'action_status_description' => 'Vérifier si les répondants peuvent intervenir sur la base de ces informations',
