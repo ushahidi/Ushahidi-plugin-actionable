@@ -13,10 +13,19 @@
  * @license    http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License (LGPL)
  */
 ?>
-			<div class="bg">
-				<h2>
-					<?php admin::reports_subtabs("actionable"); ?>
-				</h2>
+<div id="tools-content">
+   	<div class="pageheader">
+		<h1 class="pagetitle"><?php echo Kohana::lang('uchaguzi.tools'); ?></h1>
+
+		<ul class="hornav">
+			<?php echo admin::tools_nav($this_page);?>
+		</ul>
+		<nav id="tools-menu">
+			<ul class="second-level-menu">
+				<?php admin::reports_subtabs("actionable"); ?>
+			</ul>
+		</nav>
+	</div>
 				<!-- tabs -->
 				<div class="tabs">
 					<!-- tabset -->
@@ -273,3 +282,4 @@
 					</div>
 				</div>
 			</div>
+</div>
