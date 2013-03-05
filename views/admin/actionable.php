@@ -155,12 +155,6 @@
 										$submit_mode = "TWITTER";
 										$submit_by = $incident_orm->message->message_from;
 									}
-									
-									// Get the country name
-									$country_name = ($incident->country_id != 0)
-										? $countries[$incident->country_id] 
-										: $countries[Kohana::config('settings.default_country')]; 
-									
 							
 									// Retrieve Incident Categories
 									$incident_category = "";
@@ -222,7 +216,7 @@
 											</div>
 											<ul class="info">
 												<li class="none-separator"><?php echo Kohana::lang('ui_main.location');?>: 
-													<strong><?php echo $incident->location_name; ?></strong>, <strong><?php echo $country_name; ?></strong>
+													<strong><?php echo $incident->location_name; ?></strong>
 												</li>
 												<li><?php echo Kohana::lang('ui_main.submitted_by');?> 
 													<strong><?php echo $submit_by; ?></strong> via <strong><?php echo $submit_mode; ?></strong>
