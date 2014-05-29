@@ -20,7 +20,8 @@ class actionable {
 		101 => 'All',
 		102 => 'Actionable',
 		103 => 'Urgent',
-		104 => 'Action taken'
+		104 => 'Action taken',
+		105 => 'Not Actionable'
 	);
 	
 	/**
@@ -41,12 +42,20 @@ class actionable {
 	 */
 	public function add()
 	{
+		Event::add('ushahidi_filter.fetch_incidents_set_params', array($this, '_fetch_incidents_set_params'));
+		Event::add('ushahidi_filter.json_index_features', array($this, '_json_index_features'));
+
 		// Add a Sub-Nav Link
 		Event::add('ushahidi_action.nav_admin_reports', array($this, '_report_link'));
 
 		// Only add the events if we are on that controller
 		if (Router::$controller == 'reports')
 		{
+		
+			Event::add('ushahidi_action.report_filters_ui', array($this, '_reports_filters'));
+			Event::add('ushahidi_action.report_js_filterReportsAction', array($this, '_reports_filters_js'));
+
+		
 			switch (Router::$method)
 			{
 				// Hook into the Report Add/Edit Form in Admin
@@ -72,18 +81,16 @@ class actionable {
 			Event::add('ushahidi_action.feed_rss_item', array($this, '_feed_rss'));
 		}
 		elseif (Router::$controller == 'main')
-		{
+		{	
+			plugin::add_stylesheet('actionable/css/actionable_filter');
 			Event::add('ushahidi_action.map_main_filters', array($this, '_map_main_filters'));
 		}
 		elseif (Router::$controller == 'json' OR Router::$controller == 'bigmap_json')
-		{
-			Event::add('ushahidi_filter.fetch_incidents_set_params', array($this, '_fetch_incidents_set_params'));
-			Event::add('ushahidi_filter.json_index_features', array($this, '_json_index_features'));
-			
+		{			
 			// Never cluster actionable json
 			if (Router::$method == 'cluster' AND $this->_check_media_type())
 			{
-				Router::$method = 'index';
+/* 				Router::$method = 'index'; */
 			}
 		}
 	}
@@ -130,14 +137,35 @@ class actionable {
 			$action_item = ORM::factory('actionable')
 				->where('incident_id', $incident->id)
 				->find();
+				
+			$incident_message = ORM::factory('incident_message')->where('incident_id', $incident->id)->find();	
+			$messageID = $incident_message->message_id;
+			$message = ORM::factory('message')->where('id',$messageID)->find();
+			$smsFrom = $message->message_from;
+			
+			$locationID = $incident->location_id;
+			$location  = ORM::factory('location')->where('id',$locationID)->find();
+			$locationName = $location->location_name; 
+			
+			$outgoingMessage = Kohana::lang('actionable.action_taken_message').": ".$incident->incident_title." | ".$locationName." | ".$incident->incident_date;
+
 			$action_item->incident_id = $incident->id;
 			$action_item->actionable = isset($_POST['actionable']) ? 
 				$_POST['actionable'] : "";
 			$action_item->action_taken = isset($_POST['action_taken']) ?
 				$_POST['action_taken'] : "";
 			$action_item->action_summary = $_POST['action_summary'];
+			if(isset($_POST['action_taken'])){
+				if(!isset($action_item->action_date)){
+					$action_item->action_date = date("Y-m-d H:i:s",time());
+					sms::send($smsFrom,Kohana::config("settings.sms_no1"),$outgoingMessage);
+				}
+
+			}
+			else{
+				$action_item->action_date = null;
+			}			
 			$action_item->save();
-			
 		}
 	}
 	
@@ -161,10 +189,37 @@ class actionable {
 					$report->actionable = $actionable->actionable;
 					$report->action_taken = $actionable->action_taken;
 					$report->action_summary = $actionable->action_summary;
+					$report->action_date = $actionable->action_date;
 					$report->render(TRUE);
 				}
 			}
 		}
+	}
+	
+	
+		public function _reports_filters()
+	{
+
+		$reportsFilters = View::factory('actionable_reports_filters');
+		$reportsFilters->render(TRUE);
+
+	}
+	
+		public function _reports_filters_js()
+	{
+		echo '// 
+			  // Get the actionable type
+			  // 
+			  var actionableTypes = [];
+			  $.each($(".fl-actionable li a.selected"), function(i, item){
+				actionableId = item.id.substring("filter_link_actionable_".length);
+				actionableTypes.push(actionableId);
+		      });
+			
+			  if (actionableTypes.length > 0)
+			  {
+				urlParameters["k"] = actionableTypes;
+			  }';		
 	}
 	
 	/*
@@ -226,13 +281,49 @@ class actionable {
 	 */
 	public function _map_main_filters()
 	{
-		echo '</div><h3>'.Kohana::lang('actionable.actionable').'</h3><ul>';
-		foreach (self::$media_values as $k => $val) {
-			echo "<li><a id=\"media_$k\" href=\"#\"><span>$val</span></a></li>";
-		}
-		echo '</ul><div>';
-	}
+		echo '</div>';
+		echo "<script type='text/javascript'>
+jQuery(function() {
 
+$(document).ready(function() {
+	$('.actionable_filters li a').attr('class', '');
+		$( '#action_102' ).addClass('active');
+
+		// Update the report filters
+		map.updateReportFilters({k: 102});
+		return false;
+
+});
+
+$('.actionable_filters li a').click(function() {
+		var mediaType = parseFloat(this.id.replace('action_', '')) || 0;
+		
+		$('.actionable_filters li a').attr('class', '');
+		$(this).addClass('active');
+
+		// Update the report filters
+		console.log('actionable filter');
+		map.updateReportFilters({k: mediaType});
+		return false;
+	});
+});
+</script>";
+		echo '</div>';
+		echo '<div id="actionable-report-type-filter" class="actionable_filters">';
+		echo '<h3>'.Kohana::lang('actionable.actionable').'</h3><ul>';
+		foreach (self::$media_values as $k => $val) {
+			if($k == 101){ $filterName = Kohana::lang('actionable.all');}
+			if($k == 102){ $filterName = Kohana::lang('actionable.actionable');}
+			if($k == 103){ $filterName = Kohana::lang('actionable.urgent');}
+			if($k == 104){ $filterName = Kohana::lang('actionable.action_taken');}
+			if($k == 105){ $filterName = Kohana::lang('actionable.not_actionable');}
+
+			echo "<li><a id=\"action_$k\" href=\"#\"><span>$filterName</span></a></li>";
+		}
+		echo '</ul>';
+		echo '<div>';
+
+	}
 	/*
 	 * Filter incidents for main map based on actionable status
 	 */
@@ -243,15 +334,6 @@ class actionable {
 		// Look for fake media type
 		if ($filters = $this->_check_media_type())
 		{
-			// Remove media type filter based on fake actionable media type
-			// @todo make this work with normal media filters too
-			$sql = 'i.id IN (SELECT DISTINCT incident_id FROM '.Kohana::config('database.default.table_prefix').'media WHERE media_type IN ('.implode(',',$this->_check_media_type()).'))';
-			$key = array_search($sql, $params);
-			
-			if ($key !== FALSE)
-			{
-				unset($params[$key]);
-			}
 			
 			$actionable_sql = array();
 			foreach ($filters as $filter)
@@ -262,9 +344,13 @@ class actionable {
 				// Add filter based on actionable status.
 				switch ($filter)
 				{
+					case '101':
+						$actionable_sql[] = 'i.id IN (SELECT DISTINCT incident_id FROM '.Kohana::config('database.default.table_prefix').'actionable
+							WHERE (actionable = 1 OR actionable = 2 OR actionable = 0) AND (action_taken = 0 OR action_taken = 1))';
+						break;
 					case '102':
 						$actionable_sql[] = 'i.id IN (SELECT DISTINCT incident_id FROM '.Kohana::config('database.default.table_prefix').'actionable
-							WHERE actionable = 1 AND action_taken = 0)';
+							WHERE (actionable = 1 OR actionable =2) AND action_taken = 0)';
 						break;
 					case '103':
 						$actionable_sql[] = 'i.id IN (SELECT DISTINCT incident_id FROM '.Kohana::config('database.default.table_prefix').'actionable
@@ -272,7 +358,11 @@ class actionable {
 						break;
 					case '104':
 						$actionable_sql[] = 'i.id IN (SELECT DISTINCT incident_id FROM '.Kohana::config('database.default.table_prefix').'actionable
-							WHERE actionable = 1 AND action_taken = 1)';
+							WHERE action_taken = 1)';
+						break;
+					case '105':
+						$actionable_sql[] = 'i.id IN (SELECT DISTINCT incident_id FROM '.Kohana::config('database.default.table_prefix').'actionable
+							WHERE actionable = 0)';
 						break;
 				}
 			}
@@ -285,6 +375,11 @@ class actionable {
 		}
 
 		Event::$data = $params;
+/*
+		echo "<LEIF>";
+		var_dump(Event::$data);
+		echo "</LEIF>";
+*/
 	}
 	
 	/*
@@ -323,16 +418,16 @@ class actionable {
 	}
 	
 	/*
-	 * Look for fake media types in GET param
+	 * Look for fake actionable types in GET param (still uses the word media from an older version of this plugin. Pretend it says actionable.
 	 */
 	private function _check_media_type()
 	{
 		// Parse the GET param if we haven't yet.
 		if (! isset($this->media_filter)) {
 			$this->media_filter = array();
-			if (isset($_GET['m']))
+			if (isset($_GET['k']))
 			{
-				$this->media_filter = $_GET['m'];
+				$this->media_filter = $_GET['k'];
 				if (! is_array($this->media_filter))
 				{
 					$this->media_filter = explode(',',$this->media_filter);
