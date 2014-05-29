@@ -37,6 +37,7 @@ class Actionable_Install {
 				  `actionable` tinyint(4) NOT NULL DEFAULT \'0\' COMMENT \'Is a report actionable? 0=Unactionable 1=Actionable 2=Actionable+Urgent\',
 				  `action_taken` tinyint(4) NOT NULL DEFAULT \'0\' COMMENT \'Has an action been taken yet?\',
 				  `action_summary` varchar(255) DEFAULT NULL COMMENT \'What action was taken\',
+				  `action_date` DATETIME DEFAULT NULL COMMENT \'When was action taken\',
 				  PRIMARY KEY (`id`)
 				) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1');
 	}

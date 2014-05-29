@@ -1,0 +1,7 @@
+div.actionable_filters ul li a:hover, div.actionable_filters ul li a.active,
+div.actionable_filters ul li { float:none; margin-bottom:2px; display:block; overflow:auto; }
+  div.actionable_filters ul li a { color:#000; font-weight:bold; padding:3px 5px 2px; margin:1px; font-size:10px; display:block; float:left; text-transform:uppercase; }
+  div.actionable_filters ul li a span { font-size:10px; }
+  div.actionable_filters ul li a:hover, div.actionable_filters ul li a.active { -moz-border-radius: 3px; -webkit-border-radius: 3px; display:block; float:left; padding:3px 5px 2px; background:none; border:1px solid #c2c2c2; color:inherit; margin:0; }
+    #actionable-report-type-filter { overflow:auto; padding:5px; margin:0;}
+  #the-filters{width:350px !important;}
