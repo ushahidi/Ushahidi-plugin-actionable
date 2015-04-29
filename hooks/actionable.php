@@ -3,26 +3,26 @@
  * Actionable Hook - Load All Events
  *
  * PHP version 5
- * LICENSE: This source file is subject to LGPL license 
+ * LICENSE: This source file is subject to LGPL license
  * that is available through the world-wide-web at the following URI:
  * http://www.gnu.org/copyleft/lesser.html
- * @author	   Ushahidi Team <team@ushahidi.com> 
+ * @author	   Ushahidi Team <team@ushahidi.com>
  * @package	   Ushahidi - http://source.ushahididev.com
  * @copyright  Ushahidi - http://www.ushahidi.com
- * @license	   http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License (LGPL) 
+ * @license	   http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License (LGPL)
  */
 
 class actionable {
-	
+
 	private $media_filter;
-	
+
 	private static $media_values = array(
 		101 => 'All',
 		102 => 'Actionable',
 		103 => 'Urgent',
 		104 => 'Action taken'
 	);
-	
+
 	/**
 	 * Registers the main event add method
 	 */
@@ -31,11 +31,11 @@ class actionable {
 		$this->actionable = "";
 		$this->action_taken = "";
 		$this->action_summary = "";
-		
+
 		// Hook into routing
 		Event::add('system.pre_controller', array($this, 'add'));
 	}
-	
+
 	/**
 	 * Adds all the events to the main Ushahidi application
 	 */
@@ -43,7 +43,6 @@ class actionable {
 	{
 		// Add a Sub-Nav Link
 		Event::add('ushahidi_action.nav_admin_reports', array($this, '_report_link'));
-
 		// Only add the events if we are on that controller
 		if (Router::$controller == 'reports')
 		{
@@ -58,11 +57,22 @@ class actionable {
 					// Hook into the report_edit (post_SAVE) event
 					Event::add('ushahidi_action.report_edit', array($this, '_report_form_submit'));
 					break;
-				
+
 				// Hook into the Report view (front end)
 				case 'view':
 					plugin::add_stylesheet('actionable/css/actionable');
 					Event::add('ushahidi_action.report_meta', array($this, '_report_view'));
+					break;
+
+				case 'index':
+					plugin::add_stylesheet('actionable/css/actionable');
+					Event::add('ushahidi_action.report_filters_ui', array($this, '_report_filters_ui'));
+					Event::add('ushahidi_action.report_js_filterReportsAction', array($this, '_report_js_filterReportsAction'));
+					Event::add('ushahidi_action.report_js_filterReportsActionRemove', array($this, '_report_js_filterReportsActionRemove'));
+					break;
+
+				case 'fetch_reports':
+					Event::add('ushahidi_filter.fetch_incidents_set_params', array($this, '_fetch_incidents_set_params'));
 					break;
 			}
 		}
@@ -70,6 +80,10 @@ class actionable {
 		{
 			// Add Actionable Tag to RSS Feed
 			Event::add('ushahidi_action.feed_rss_item', array($this, '_feed_rss'));
+		}
+		elseif (Router::$controller == 'reports')
+		{
+			Event::add('ushahidi_action.map_main_filters', array($this, '_map_main_filters'));
 		}
 		elseif (Router::$controller == 'main')
 		{
@@ -79,7 +93,7 @@ class actionable {
 		{
 			Event::add('ushahidi_filter.fetch_incidents_set_params', array($this, '_fetch_incidents_set_params'));
 			Event::add('ushahidi_filter.json_index_features', array($this, '_json_index_features'));
-			
+
 			// Never cluster actionable json
 			if (Router::$method == 'cluster' AND $this->_check_media_type())
 			{
@@ -87,7 +101,7 @@ class actionable {
 			}
 		}
 	}
-	
+
 	/**
 	 * Add Actionable Form input to the Report Submit Form
 	 */
@@ -97,7 +111,7 @@ class actionable {
 		$form = View::factory('actionable_form');
 		// Get the ID of the Incident (Report)
 		$id = Event::$data;
-		
+
 		if ($id)
 		{
 			// Do We have an Existing Actionable Item for this Report?
@@ -111,13 +125,13 @@ class actionable {
 				$this->action_summary = $action_item->action_summary;
 			}
 		}
-		
+
 		$form->actionable = $this->actionable;
 		$form->action_taken = $this->action_taken;
 		$form->action_summary = $this->action_summary;
 		$form->render(TRUE);
 	}
-	
+
 	/**
 	 * Handle Form Submission and Save Data
 	 */
@@ -131,16 +145,16 @@ class actionable {
 				->where('incident_id', $incident->id)
 				->find();
 			$action_item->incident_id = $incident->id;
-			$action_item->actionable = isset($_POST['actionable']) ? 
+			$action_item->actionable = isset($_POST['actionable']) ?
 				$_POST['actionable'] : "";
 			$action_item->action_taken = isset($_POST['action_taken']) ?
 				$_POST['action_taken'] : "";
 			$action_item->action_summary = $_POST['action_summary'];
 			$action_item->save();
-			
+
 		}
 	}
-	
+
 	/**
 	 * Render the Action Taken Information to the Report
 	 * on the front end
@@ -166,7 +180,7 @@ class actionable {
 			}
 		}
 	}
-	
+
 	/*
 	 * Add actionable link to reports admin tabs
 	 **/
@@ -175,7 +189,7 @@ class actionable {
 		$this_sub_page = Event::$data;
 		echo ($this_sub_page == "actionable") ? Kohana::lang('actionable.actionable') : "<a href=\"".url::site()."admin/actionable\">".Kohana::lang('actionable.actionable')."</a>";
 	}
-	
+
 	/**
 	 * Add the <actionable> tag to the RSS feed
 	 */
@@ -204,7 +218,7 @@ class actionable {
 					echo "<actionable>NO</actionable>\n";
 					echo "<urgent>NO</urgent>\n";
 				}
-				
+
 				if ($action_item->action_taken)
 				{
 					echo "<actiontaken>YES</actiontaken>\n";
@@ -220,7 +234,7 @@ class actionable {
 			}
 		}
 	}
-	
+
 	/*
 	 * Add actionable filters on main map
 	 */
@@ -234,59 +248,119 @@ class actionable {
 	}
 
 	/*
+	* Add appropriate UI for reports page filter
+	*/
+	public function _report_filters_ui()
+	{
+		$filter = View::factory('actionable_filter');
+		$filter->render(TRUE);
+	}
+
+	/*
+	* Add appropriate filter logic for reports page
+	*/
+	public function _report_js_filterReportsAction()
+	{
+		$filter_js = View::factory('actionable_filter_js');
+		$filter_js->render(TRUE);
+	}
+
+	/*
+	* Remove appropriate filter logic for reports page
+	*/
+	public function _report_js_filterReportsActionRemove()
+	{
+		$filter_js = View::factory('actionable_filter_remove_js');
+		$filter_js->render(TRUE);
+	}
+
+	/*
+	* Perform the filtering of reports
+	*//*
+	public function _fetch_incidents_set_params($params)
+	{
+		echo '<pre>';
+		var_dump($params);
+		die();
+	}*/
+
+	/*
 	 * Filter incidents for main map based on actionable status
 	 */
 	public function _fetch_incidents_set_params()
 	{
 		$params = Event::$data;
-		
-		// Look for fake media type
-		if ($filters = $this->_check_media_type())
-		{
-			// Remove media type filter based on fake actionable media type
-			// @todo make this work with normal media filters too
-			$sql = 'i.id IN (SELECT DISTINCT incident_id FROM '.Kohana::config('database.default.table_prefix').'media WHERE media_type IN ('.implode(',',$this->_check_media_type()).'))';
-			$key = array_search($sql, $params);
-			
-			if ($key !== FALSE)
+
+		// ---------- BEGIN HACKY IMPLEMENTATION (used on homepage map)
+		if(!isset($_GET['plugin_actionable_filter']) OR !is_array($_GET['plugin_actionable_filter'])) {
+			// If we're doing the hacky fake media trick, run this.
+			// Look for fake media type
+			if ($filters = $this->_check_media_type())
 			{
-				unset($params[$key]);
-			}
-			
-			$actionable_sql = array();
-			foreach ($filters as $filter)
-			{
-				// Cast the $filter to int just in case
-				$filter = intval($filter);
-				
-				// Add filter based on actionable status.
-				switch ($filter)
+				// Remove media type filter based on fake actionable media type
+				// @todo make this work with normal media filters too
+				$sql = 'i.id IN (SELECT DISTINCT incident_id FROM '.Kohana::config('database.default.table_prefix').'media WHERE media_type IN ('.implode(',',$this->_check_media_type()).'))';
+				$key = array_search($sql, $params);
+
+				if ($key !== FALSE)
 				{
-					case '102':
-						$actionable_sql[] = 'i.id IN (SELECT DISTINCT incident_id FROM '.Kohana::config('database.default.table_prefix').'actionable
-							WHERE actionable = 1 AND action_taken = 0)';
-						break;
-					case '103':
-						$actionable_sql[] = 'i.id IN (SELECT DISTINCT incident_id FROM '.Kohana::config('database.default.table_prefix').'actionable
-							WHERE actionable = 2 AND action_taken = 0)';
-						break;
-					case '104':
-						$actionable_sql[] = 'i.id IN (SELECT DISTINCT incident_id FROM '.Kohana::config('database.default.table_prefix').'actionable
-							WHERE actionable = 1 AND action_taken = 1)';
-						break;
+					unset($params[$key]);
+				}
+
+				$actionable_sql = array();
+				foreach ($filters as $filter)
+				{
+					// Cast the $filter to int just in case
+					$filter = intval($filter);
+
+					// Add filter based on actionable status.
+					switch ($filter)
+					{
+						case '102':
+							$actionable_sql[] = 'i.id IN (SELECT DISTINCT incident_id FROM '.Kohana::config('database.default.table_prefix').'actionable
+								WHERE actionable = 1 AND action_taken = 0)';
+							break;
+						case '103':
+							$actionable_sql[] = 'i.id IN (SELECT DISTINCT incident_id FROM '.Kohana::config('database.default.table_prefix').'actionable
+								WHERE actionable = 2 AND action_taken = 0)';
+							break;
+						case '104':
+							$actionable_sql[] = 'i.id IN (SELECT DISTINCT incident_id FROM '.Kohana::config('database.default.table_prefix').'actionable
+								WHERE actionable = 1 AND action_taken = 1)';
+							break;
+					}
+				}
+
+				if (count($actionable_sql) > 0)
+				{
+					$actionable_sql = '('.implode(' OR ',$actionable_sql).')';
+					$params[] = $actionable_sql;
 				}
 			}
 
-			if (count($actionable_sql) > 0)
-			{
-				$actionable_sql = '('.implode(' OR ',$actionable_sql).')';
-				$params[] = $actionable_sql;
-			}
+			Event::$data = $params;
+			return;
+		}
+		// ---------- END HACKY IMPLEMENTATION (used on homepage map)
+
+		// This is the Non-hacky way of filtering reports
+
+		$actionable_ids = $_GET['plugin_actionable_filter'];
+		$actionable_sql = array();
+		foreach($actionable_ids AS $id) {
+			$actionable_sql[] = 'i.id IN (SELECT DISTINCT incident_id FROM '.Kohana::config('database.default.table_prefix').'actionable
+						WHERE actionable = '.intval($id).' AND action_taken = 0)';
+		}
+
+		if (count($actionable_sql) > 0)
+		{
+			$actionable_sql = '('.implode(' OR ',$actionable_sql).')';
+			$params[] = $actionable_sql;
 		}
 
 		Event::$data = $params;
 	}
-	
+
 	/*
 	 * Customise feature display based on actionable status
 	 */
@@ -296,13 +370,13 @@ class actionable {
 		{
 			$features = Event::$data;
 			$results = ORM::Factory('actionable')->find_all()->as_array();
-			
+
 			$actionables = array();
 			foreach($results as $actionable)
 			{
 				$actionables[$actionable->incident_id] = $actionable;
 			}
-			
+
 			foreach($features as $key => $feature)
 			{
 				$incident_id = $feature['properties']['id'];
@@ -317,11 +391,11 @@ class actionable {
 					$features[$key] = $feature;
 				}
 			}
-			
+
 			Event::$data = $features;
 		}
 	}
-	
+
 	/*
 	 * Look for fake media types in GET param
 	 */
@@ -337,17 +411,17 @@ class actionable {
 				{
 					$this->media_filter = explode(',',$this->media_filter);
 				}
-				// Keep only the 
+				// Keep only the
 				$this->media_filter = array_intersect(array_keys(self::$media_values), $this->media_filter);
 			}
 		}
-		
+
 		// Return filters, if any
 		if (count($this->media_filter) > 0)
 		{
 			return $this->media_filter;
 		}
-		
+
 		return FALSE;
 	}
 
