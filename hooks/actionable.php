@@ -69,6 +69,7 @@ class actionable {
 					Event::add('ushahidi_action.report_filters_ui', array($this, '_report_filters_ui'));
 					Event::add('ushahidi_action.report_js_filterReportsAction', array($this, '_report_js_filterReportsAction'));
 					Event::add('ushahidi_action.report_js_filterReportsActionRemove', array($this, '_report_js_filterReportsActionRemove'));
+					Event::add('ushahidi_action.report_js_keyToFilter', array($this, '_report_js_keyToFilter'));
 					break;
 
 				case 'fetch_reports':
@@ -275,14 +276,15 @@ class actionable {
 	}
 
 	/*
-	* Perform the filtering of reports
-	*//*
-	public function _fetch_incidents_set_params($params)
+	* Remove appropriate filter logic for reports page
+	*/
+	public function _report_js_keyToFilter()
 	{
-		echo '<pre>';
-		var_dump($params);
-		die();
-	}*/
+		$filter_js = View::factory('actionable_filter_key_to_filter_js');
+		$filter_js->render(TRUE);
+	}
+
+
 
 	/*
 	 * Filter incidents for main map based on actionable status
