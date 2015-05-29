@@ -340,15 +340,19 @@ class actionable {
 					{
 						case '102':
 							$actionable_sql[] = 'i.id IN (SELECT DISTINCT incident_id FROM '.Kohana::config('database.default.table_prefix').'actionable
-								WHERE actionable = 1 AND action_taken = 0)';
+								WHERE actionable = 1 AND action_taken = 0 AND action_closed = 0)';
 							break;
 						case '103':
 							$actionable_sql[] = 'i.id IN (SELECT DISTINCT incident_id FROM '.Kohana::config('database.default.table_prefix').'actionable
-								WHERE actionable = 2 AND action_taken = 0)';
+								WHERE actionable = 2 AND action_taken = 0 AND action_closed = 0)';
 							break;
 						case '104':
 							$actionable_sql[] = 'i.id IN (SELECT DISTINCT incident_id FROM '.Kohana::config('database.default.table_prefix').'actionable
-								WHERE actionable = 1 AND action_taken = 1)';
+								WHERE actionable = 1 AND action_taken = 1 AND action_closed = 0)';
+							break;
+						case '105':
+							$actionable_sql[] = 'i.id IN (SELECT DISTINCT incident_id FROM '.Kohana::config('database.default.table_prefix').'actionable
+								WHERE action_closed = 1)';
 							break;
 					}
 				}
@@ -371,7 +375,7 @@ class actionable {
 		$actionable_sql = array();
 		foreach($actionable_ids AS $id) {
 			$actionable_sql[] = 'i.id IN (SELECT DISTINCT incident_id FROM '.Kohana::config('database.default.table_prefix').'actionable
-						WHERE actionable = '.intval($id).' AND action_taken = 0)';
+						WHERE actionable = '.intval($id).' AND action_taken = 0)'; // SJF: Might need to change this for action_closed too
 		}
 
 		if (count($actionable_sql) > 0)
