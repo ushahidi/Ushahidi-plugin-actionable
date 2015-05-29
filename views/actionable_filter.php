@@ -24,5 +24,11 @@
 				<span class="item-title"><?php echo Kohana::lang('actionable.not_actionable'); ?></span>
 			</a>
 		</li>
+		<li>
+			<a href="#" id="filter_actionable_3">
+				<!--span class="item-icon ic-unverified">&nbsp;</span-->
+				<span class="item-title"><?php echo Kohana::lang('actionable.action-closed'); ?></span>
+			</a>
+		</li>
 	</ul>
 </div>

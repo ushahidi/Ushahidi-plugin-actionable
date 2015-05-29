@@ -19,4 +19,10 @@
 		<strong><?php echo Kohana::lang('actionable.summary');?>: </strong><?php echo $action_summary; ?>
 		</div>
 	<?php }; ?>
+  <?php if ($action_closed) { ?>
+    <div id="action-closed">
+      <?php echo Kohana::lang('actionable.action-closed');?>
+    </div>
+  <?php }; ?>
+
 </div>

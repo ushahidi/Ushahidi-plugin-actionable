@@ -20,4 +20,11 @@
   <textarea name="action_summary" id="action_summary" style=" height: 60px;"><?php echo $action_summary; ?></textarea>
 </div>
 <!-- / report is acted on -->
+
+<!-- report is closed -->
+<div class="row">
+    <?php print form::radio('actionable', '3', $actionable == 3); ?> <?php echo Kohana::lang('actionable.action-closed') ?>
+</div>
+<!-- /report is closed -->
+
 </div>
