@@ -36,6 +36,7 @@ class Actionable_Install {
 				  `incident_id` int(11) NOT NULL COMMENT \'incident_id of the new report that is created\',
 				  `actionable` tinyint(4) NOT NULL DEFAULT \'0\' COMMENT \'Is a report actionable? 0=Unactionable 1=Actionable 2=Actionable+Urgent\',
 				  `action_taken` tinyint(4) NOT NULL DEFAULT \'0\' COMMENT \'Has an action been taken yet?\',
+				  `action_closed` tinyint(4) NOT NULL DEFAULT \'0\' COMMENT \'Has this action been closed?\',
 				  `action_summary` varchar(255) DEFAULT NULL COMMENT \'What action was taken\',
 				  PRIMARY KEY (`id`)
 				) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1');

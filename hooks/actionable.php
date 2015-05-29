@@ -20,7 +20,8 @@ class actionable {
 		101 => 'All',
 		102 => 'Actionable',
 		103 => 'Urgent',
-		104 => 'Action taken'
+		104 => 'Action taken',
+		105 => 'Closed'
 	);
 
 	/**
@@ -31,6 +32,7 @@ class actionable {
 		$this->actionable = "";
 		$this->action_taken = "";
 		$this->action_summary = "";
+		$this->action_closed = "";
 
 		// Hook into routing
 		Event::add('system.pre_controller', array($this, 'add'));
@@ -124,12 +126,14 @@ class actionable {
 				$this->actionable = $action_item->actionable;
 				$this->action_taken = $action_item->action_taken;
 				$this->action_summary = $action_item->action_summary;
+				$this->action_closed = $action_item->action_closed;
 			}
 		}
 
 		$form->actionable = $this->actionable;
 		$form->action_taken = $this->action_taken;
 		$form->action_summary = $this->action_summary;
+		$form->action_closed = $this->action_closed;
 		$form->render(TRUE);
 	}
 
@@ -151,6 +155,8 @@ class actionable {
 			$action_item->action_taken = isset($_POST['action_taken']) ?
 				$_POST['action_taken'] : "";
 			$action_item->action_summary = $_POST['action_summary'];
+			$action_item->action_closed = isset($_POST['action_closed']) ?
+				$_POST['action_closed'] : "";
 			$action_item->save();
 
 		}
@@ -176,6 +182,7 @@ class actionable {
 					$report->actionable = $actionable->actionable;
 					$report->action_taken = $actionable->action_taken;
 					$report->action_summary = $actionable->action_summary;
+					$report->action_closed = $actionable->action_closed;
 					$report->render(TRUE);
 				}
 			}
@@ -223,15 +230,28 @@ class actionable {
 				if ($action_item->action_taken)
 				{
 					echo "<actiontaken>YES</actiontaken>\n";
-				} else {
+				} 
+				else 
+				{
 					echo "<actiontaken>NO</actiontaken>\n";
 				}
+
+				if ($action_item->action_closed == 1)
+				{
+					echo "<actionclosed>YES</actionclosed>\n";
+				}
+				else
+				{
+					echo "<actionclosed>NO</actionclosed>\n";				
+				}
+
 			}
 			else
 			{
 				echo "<actionable>NO</actionable>\n";
 				echo "<urgent>NO</urgent>\n";
 				echo "<actiontaken>NO</actiontaken>\n";
+				echo "<actionclosed>NO</actionclosed>\n";				
 			}
 		}
 	}
