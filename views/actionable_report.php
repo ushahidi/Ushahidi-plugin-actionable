@@ -4,7 +4,7 @@
       <?php echo Kohana::lang('actionable.action_needed');?>
     </div>
 	<?php }; ?>
-  <?php if (!$action_taken && $actionable == 2) { ?>
+  <?php if ($action_urgent == 1) { ?>
     <div id="action-urgent-badge">
       <?php echo Kohana::lang('actionable.action_urgent');?>
     </div>

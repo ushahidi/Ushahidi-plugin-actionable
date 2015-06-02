@@ -123,17 +123,19 @@ class actionable {
 				->find();
 			if ($action_item->loaded)
 			{
-				$this->actionable = $action_item->actionable;
-				$this->action_taken = $action_item->action_taken;
+				$this->actionable     = $action_item->actionable;
+				$this->action_urgent  = $action_item->action_urgent;
+				$this->action_taken   = $action_item->action_taken;
 				$this->action_summary = $action_item->action_summary;
-				$this->action_closed = $action_item->action_closed;
+				$this->action_closed  = $action_item->action_closed;
 			}
 		}
 
-		$form->actionable = $this->actionable;
-		$form->action_taken = $this->action_taken;
+		$form->actionable     = $this->actionable;
+		$form->action_urgent  = $action_item->action_urgent;
+		$form->action_taken   = $this->action_taken;
 		$form->action_summary = $this->action_summary;
-		$form->action_closed = $this->action_closed;
+		$form->action_closed  = $this->action_closed;
 		$form->render(TRUE);
 	}
 
@@ -152,6 +154,8 @@ class actionable {
 			$action_item->incident_id = $incident->id;
 			$action_item->actionable = isset($_POST['actionable']) ?
 				$_POST['actionable'] : "";
+			$action_item->action_urgent = isset($_POST['action_urgent']) ?
+				$_POST['action_urgent'] : "";
 			$action_item->action_taken = isset($_POST['action_taken']) ?
 				$_POST['action_taken'] : "";
 			$action_item->action_summary = $_POST['action_summary'];
@@ -179,10 +183,11 @@ class actionable {
 				if ($actionable->actionable)
 				{
 					$report = View::factory('actionable_report');
-					$report->actionable = $actionable->actionable;
-					$report->action_taken = $actionable->action_taken;
+					$report->actionable     = $actionable->actionable;
+					$report->action_urgent  = $actionable->action_urgent;
+					$report->action_taken   = $actionable->action_taken;
 					$report->action_summary = $actionable->action_summary;
-					$report->action_closed = $actionable->action_closed;
+					$report->action_closed  = $actionable->action_closed;
 					$report->render(TRUE);
 				}
 			}
@@ -211,38 +216,28 @@ class actionable {
 				->find();
 			if ($action_item->loaded)
 			{
-				if ($action_item->actionable == 1)
-				{
+				if ($action_item->actionable == 1) {
 					echo "<actionable>YES</actionable>\n";
-					echo "<urgent>NO</urgent>\n";
-				}
-				elseif ($action_item->actionable == 2)
-				{
-					echo "<actionable>YES</actionable>\n";
-					echo "<urgent>YES</urgent>\n";
-				}
-				else
-				{
+				} else {
 					echo "<actionable>NO</actionable>\n";
+				}
+
+				if ($action_item->action_urgent == 1) {
+					echo "<urgent>YES</urgent>\n";
+				} else {
 					echo "<urgent>NO</urgent>\n";
 				}
 
-				if ($action_item->action_taken)
-				{
+				if ($action_item->action_taken) {
 					echo "<actiontaken>YES</actiontaken>\n";
-				} 
-				else 
-				{
+				} else {
 					echo "<actiontaken>NO</actiontaken>\n";
 				}
 
-				if ($action_item->action_closed == 1)
-				{
+				if ($action_item->action_closed == 1) {
 					echo "<actionclosed>YES</actionclosed>\n";
-				}
-				else
-				{
-					echo "<actionclosed>NO</actionclosed>\n";				
+				} else {
+					echo "<actionclosed>NO</actionclosed>\n";
 				}
 
 			}
@@ -251,7 +246,7 @@ class actionable {
 				echo "<actionable>NO</actionable>\n";
 				echo "<urgent>NO</urgent>\n";
 				echo "<actiontaken>NO</actiontaken>\n";
-				echo "<actionclosed>NO</actionclosed>\n";				
+				echo "<actionclosed>NO</actionclosed>\n";
 			}
 		}
 	}
@@ -344,7 +339,7 @@ class actionable {
 							break;
 						case '103':
 							$actionable_sql[] = 'i.id IN (SELECT DISTINCT incident_id FROM '.Kohana::config('database.default.table_prefix').'actionable
-								WHERE actionable = 2 AND action_taken = 0 AND action_closed = 0)';
+								WHERE action_urgent = 1 AND action_taken = 0 AND action_closed = 0)';
 							break;
 						case '104':
 							$actionable_sql[] = 'i.id IN (SELECT DISTINCT incident_id FROM '.Kohana::config('database.default.table_prefix').'actionable

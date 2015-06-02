@@ -27,10 +27,6 @@ class Actionable_Model extends ORM
 			{
 				return Kohana::lang('actionable.action_taken');
 			}
-			elseif ($this->actionable == 2)
-			{
-				return Kohana::lang('actionable.urgent');
-			}
 			else
 			{
 				return Kohana::lang('actionable.actionable');

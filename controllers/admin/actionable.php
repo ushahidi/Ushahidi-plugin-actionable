@@ -49,8 +49,8 @@ class Actionable_Controller extends Reports_Controller {
 			}
 			elseif (strtolower($status) == 'urgent')
 			{
-				$actionable_filter = 'actionable = 2 AND action_taken = 0';
-				$this->params['actionable'] = 'i.id IN (SELECT DISTINCT incident_id FROM `'.Kohana::config('database.default.table_prefix').'actionable` WHERE actionable = 2 AND action_taken = 0)';
+				$actionable_filter = 'action_urgent = 1 AND action_taken = 0';
+				$this->params['actionable'] = 'i.id IN (SELECT DISTINCT incident_id FROM `'.Kohana::config('database.default.table_prefix').'actionable` WHERE action_urgent = 1 AND action_taken = 0)';
 			}
 			elseif (strtolower($status) == 'taken')
 			{
