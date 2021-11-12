@@ -1,1 +1,0 @@
-keyToFilter['plugin_actionable_filter'] = 'filter_actionable_';
